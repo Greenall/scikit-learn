@@ -116,7 +116,9 @@ def mean_shift(X, bandwidth=None, seeds=None, bin_seeding=False,
         bandwidth = estimate_bandwidth(X)
     if seeds is None:
         if bin_seeding:
-            seeds = get_bin_seeds(X, bandwidth, min_bin_freq)
+            #l**p norm of distance determines bin size  
+            bin_size = np.int(2*((bandwidth**n_features)/n_features)**(1/float(n_features)))
+            seeds = get_bin_seeds(X, bin_size, min_bin_freq)
         else:
             seeds = X
     n_samples, n_features = X.shape
@@ -212,7 +214,8 @@ def get_bin_seeds(X, bin_size, min_bin_freq=1):
     # Select only those bins as seeds which have enough members
     bin_seeds = np.array([point for point, freq in six.iteritems(bin_sizes) if
                           freq >= min_bin_freq], dtype=np.float32)
-    bin_seeds = bin_seeds * bin_size
+    # Seeds should be midpoint of bin
+    bin_seeds = (bin_seeds + 0.5) * bin_size
     return bin_seeds
 
 
